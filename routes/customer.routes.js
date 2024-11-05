@@ -1,14 +1,12 @@
 import express from "express";
+import { addCustomer } from "../controllers/customer.controller.js";
 
 
 
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-
-});
-
+router.post("/add",addCustomer )
 
 
 
