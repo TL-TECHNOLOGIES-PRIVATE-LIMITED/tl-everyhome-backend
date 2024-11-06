@@ -1,13 +1,13 @@
 import express from "express";
-import { adduser } from "../controllers/customer.controller.js";
+import { addAddress, login } from "../controllers/customer.controller.js";
 
 
 
 
 const router = express.Router();
 
-router.post("/add",adduser )
-
+router.post("/login", login);
+router.post("/addAddress", addAddress);
 
 
 

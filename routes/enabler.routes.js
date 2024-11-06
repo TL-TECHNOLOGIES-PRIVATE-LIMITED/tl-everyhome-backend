@@ -1,4 +1,5 @@
 import express from "express";
+import { addAddress, login } from "../controllers/enabler.controller.js";
 
 
 
@@ -6,6 +7,8 @@ import express from "express";
 const router = express.Router();
 
 
+router.post("/login", login);
+router.post("/addAddress", addAddress);
 
 
 

@@ -4,27 +4,45 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 
-export const adduser = async (req, res) => {
-    const { email, name } = req.body;
 
+export const login = async (req, res) => {
+    const { fullName, phoneNumber, email, name, provider, providerId } = req.body;
     try {
-        // Create a new user in the database
-        const user = await prisma.user.create({
+        const customer = await prisma.customer.create({
             data: {
+                fullName,
+                phoneNumber,
                 email,
                 name,
-            },
+                provider,
+                providerId
+            }
         });
-
-        // Respond with the created user
-        res.status(201).json(user);
+        res.status(200).json(customer);
     } catch (error) {
-        // Handle errors, such as unique constraint violations
-        if (error.code === 'P2002') {
-            return res.status(409).json({ error: 'Email already exists.' });
-        }
         console.log(error);
-        res.status(500).json({ error: 'An error occurred while creating the user.' });
+        res.status(500).json({ message: "Error occured while creating customer" });
     }
+}
 
-};
+export const addAddress = async (req, res) => {
+    const { customerId, street, city, state, zip, latitude, longitude, addressType } = req.body;
+    try {
+        const address = await prisma.address.create({
+            data: {
+                customerId,
+                street,
+                city,
+                state,
+                zip,
+                latitude,
+                longitude,
+                addressType
+            }
+        });
+        res.status(200).json(address);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error occured while creating address" });
+    }
+}

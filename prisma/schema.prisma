@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,9 +8,50 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+model Customer {
+  customerId  Int       @id @default(autoincrement())
+  phoneNumber String?   @unique
+  email       String?   @unique
+  provider    String?   @db.VarChar(50)
+  providerId  String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  fullName    String
+  addresses   Address[] @relation("CustomerAddresses")
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  @@map("Customers")
+}
+
+model Enabler {
+  enablerId   Int       @id @default(autoincrement())
+  fullName    String
+  phoneNumber String?   @unique
+  email       String?   @unique
+  provider    String?   @db.VarChar(50)
+  providerId  String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  addresses   Address[] @relation("EnablerAddresses")
+
+  @@map("enabler")
+}
+
+model Address {
+  addressId   Int       @id @default(autoincrement())
+  street      String
+  city        String
+  state       String
+  zip         String
+  latitude    Float
+  longitude   Float
+  isDefault   Boolean   @default(false)
+  addressType String    @default("HOME")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  customerId  Int?
+  enablerId   Int?
+  customer    Customer? @relation("CustomerAddresses", fields: [customerId], references: [customerId])
+  enabler     Enabler?  @relation("EnablerAddresses", fields: [enablerId], references: [enablerId])
+
+  @@map("Addresses")
 }
