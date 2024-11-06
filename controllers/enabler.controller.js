@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 
-export const login = async (req, res) => {
+export const register = async (req, res) => {
     const { fullName, phoneNumber, email, name, provider, providerId } = req.body;
     try {
         const enabler = await prisma.enabler.create({

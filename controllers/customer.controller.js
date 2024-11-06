@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 
 
-export const login = async (req, res) => {
+export const register = async (req, res) => {
     const { fullName, phoneNumber, email, name, provider, providerId } = req.body;
     try {
         const customer = await prisma.customer.create({
@@ -20,7 +20,7 @@ export const login = async (req, res) => {
         });
         res.status(200).json(customer);
     } catch (error) {
-        console.log(error);
+        console.log('error occured while creating customer', error);
         res.status(500).json({ message: "Error occured while creating customer" });
     }
 }
@@ -42,7 +42,7 @@ export const addAddress = async (req, res) => {
         });
         res.status(200).json(address);
     } catch (error) {
-        console.log(error);
+        console.log('error occured while adding customer address', error);
         res.status(500).json({ message: "Error occured while creating address" });
     }
 }

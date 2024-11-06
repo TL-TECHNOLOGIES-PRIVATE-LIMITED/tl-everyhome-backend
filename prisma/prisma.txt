@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "sqlserver"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Customer {
+  customerId  Int       @id @default(autoincrement())
+  phoneNumber String?   @unique
+  email       String?   @unique
+  provider    String?   @db.VarChar(50)
+  providerId  String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  fullName    String
+  addresses   Address[] @relation("CustomerAddresses")
+
+  @@map("Customers")
+}
+
+model Enabler {
+  enablerId   Int       @id @default(autoincrement())
+  fullName    String
+  phoneNumber String?   @unique
+  email       String?   @unique
+  provider    String?   @db.VarChar(50)
+  providerId  String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  addresses   Address[] @relation("EnablerAddresses")
+
+  @@map("enabler")
+}
+
+model Address {
+  addressId   Int       @id @default(autoincrement())
+  street      String
+  city        String
+  state       String
+  zip         String
+  latitude    Float
+  longitude   Float
+  isDefault   Boolean   @default(false)
+  addressType String    @default("HOME")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  customerId  Int?
+  enablerId   Int?
+  customer    Customer? @relation("CustomerAddresses", fields: [customerId], references: [customerId])
+  enabler     Enabler?  @relation("EnablerAddresses", fields: [enablerId], references: [enablerId])
+
+  @@map("Addresses")
+}
