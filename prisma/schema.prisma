@@ -11,20 +11,20 @@ datasource db {
 
 
 model User {
-  id            String   @id @db.VarChar(128) 
-  phoneNumber   String   @unique @db.VarChar(15)
-  email         String?  @db.VarChar(100)
-  isVerified    Boolean  @default(false)
-  createdAt     DateTime @default(now()) @db.DateTime2
-  updatedAt     DateTime @updatedAt @db.DateTime2
-
-  roles         UserRole[] 
-  customer      Customer?  
-  enabler       Enabler?   
-  owner         Owner? 
-
-  deviceTokens  DeviceToken[] 
-  authSessions  AuthSession[] 
+  id            String        @id @db.VarChar(128)
+  phoneNumber   String        @unique @db.VarChar(15)
+  email         String?       @db.VarChar(100)
+  isVerified    Boolean       @default(false)
+  createdAt     DateTime      @default(now()) @db.DateTime2
+  updatedAt     DateTime      @updatedAt @db.DateTime2
+  
+  roles         UserRole[]
+  customer      Customer?
+  enabler       Enabler?
+  owner         Owner?
+  deviceTokens  DeviceToken[]
+  authSessions  AuthSession[]
+  subscription  Subscription?
 }
 
 model Role {
@@ -88,7 +88,7 @@ model Owner {
 
 model DeviceToken {
   id        String   @id @default(uuid()) @db.UniqueIdentifier
-  userId    String   @db.VarChar(128) // Matching User UID type
+  userId    String   @db.VarChar(128)
   token     String   @db.VarChar(500)
   device    String   @db.VarChar(100)
   isActive  Boolean  @default(true)
@@ -96,6 +96,8 @@ model DeviceToken {
   updatedAt DateTime @updatedAt @db.DateTime2
 
   user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, isActive], name: "UniqueActiveDevice")
 }
 
 model AuthSession {
@@ -109,4 +111,18 @@ model AuthSession {
   updatedAt DateTime @updatedAt @db.DateTime2
 
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                String   @id @default(uuid()) @db.UniqueIdentifier
+  userId            String   @unique @db.VarChar(128)
+  plan              String   @db.VarChar(50)
+  status            String   @db.VarChar(20)
+  startDate         DateTime @db.DateTime2
+  endDate           DateTime @db.DateTime2
+  allowedDevices    Int      @default(1)
+  createdAt         DateTime @default(now()) @db.DateTime2
+  updatedAt         DateTime @updatedAt @db.DateTime2
+
+  user              User     @relation(fields: [userId], references: [id])
 }
