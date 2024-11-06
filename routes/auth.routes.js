@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyOTP } from "../controllers/auth.controller.js";
+import { createAccount, getUser} from "../controllers/auth.controller.js";
 import verifyFirebaseToken from "../middlewares/verifyIdToken.js";
 
 
@@ -9,8 +9,8 @@ const router = express.Router();
 
 
 
-router.post("/verifyOTP",verifyFirebaseToken, verifyOTP);
-
+router.post("/create-account",verifyFirebaseToken, createAccount);
+router.post("/getUser",verifyFirebaseToken, getUser);
 
 
 export default router;

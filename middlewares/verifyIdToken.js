@@ -1,7 +1,8 @@
 
 import admin from 'firebase-admin';
+import initializeFirebase from '../config/firebaseAdmin.js';
 
-
+initializeFirebase();
 const verifyFirebaseToken = async (req, res, next) => {
     try {
       const token = req.headers.authorization?.split('Bearer ')[1];
@@ -14,6 +15,7 @@ const verifyFirebaseToken = async (req, res, next) => {
       req.user = decodedToken;
       next();
     } catch (error) {
+      console.log(error,'invalid token');
       res.status(401).json({ error: 'Invalid token' });
     }
   };
