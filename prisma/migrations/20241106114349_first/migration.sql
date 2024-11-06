@@ -4,7 +4,7 @@ BEGIN TRAN;
 
 -- CreateTable
 CREATE TABLE [dbo].[User] (
-    [id] UNIQUEIDENTIFIER NOT NULL,
+    [id] VARCHAR(128) NOT NULL,
     [phoneNumber] VARCHAR(15) NOT NULL,
     [email] VARCHAR(100),
     [isVerified] BIT NOT NULL CONSTRAINT [User_isVerified_df] DEFAULT 0,
@@ -25,7 +25,7 @@ CREATE TABLE [dbo].[Role] (
 
 -- CreateTable
 CREATE TABLE [dbo].[UserRole] (
-    [userId] UNIQUEIDENTIFIER NOT NULL,
+    [userId] VARCHAR(128) NOT NULL,
     [roleId] UNIQUEIDENTIFIER NOT NULL,
     CONSTRAINT [UserRole_pkey] PRIMARY KEY CLUSTERED ([userId],[roleId])
 );
@@ -33,7 +33,7 @@ CREATE TABLE [dbo].[UserRole] (
 -- CreateTable
 CREATE TABLE [dbo].[Customer] (
     [id] UNIQUEIDENTIFIER NOT NULL,
-    [userId] UNIQUEIDENTIFIER NOT NULL,
+    [userId] VARCHAR(128) NOT NULL,
     [fullName] NVARCHAR(50) NOT NULL,
     [address] NVARCHAR(200),
     [profileImage] VARCHAR(500),
@@ -46,7 +46,7 @@ CREATE TABLE [dbo].[Customer] (
 -- CreateTable
 CREATE TABLE [dbo].[Enabler] (
     [id] UNIQUEIDENTIFIER NOT NULL,
-    [userId] UNIQUEIDENTIFIER NOT NULL,
+    [userId] VARCHAR(128) NOT NULL,
     [fullName] NVARCHAR(50) NOT NULL,
     [experience] NVARCHAR(50) NOT NULL,
     [description] NVARCHAR(500),
@@ -61,7 +61,7 @@ CREATE TABLE [dbo].[Enabler] (
 -- CreateTable
 CREATE TABLE [dbo].[Owner] (
     [id] UNIQUEIDENTIFIER NOT NULL,
-    [userId] UNIQUEIDENTIFIER NOT NULL,
+    [userId] VARCHAR(128) NOT NULL,
     [firstName] NVARCHAR(50) NOT NULL,
     [lastName] NVARCHAR(50) NOT NULL,
     [companyName] NVARCHAR(100),
@@ -77,7 +77,7 @@ CREATE TABLE [dbo].[Owner] (
 -- CreateTable
 CREATE TABLE [dbo].[DeviceToken] (
     [id] UNIQUEIDENTIFIER NOT NULL,
-    [userId] UNIQUEIDENTIFIER NOT NULL,
+    [userId] VARCHAR(128) NOT NULL,
     [token] VARCHAR(500) NOT NULL,
     [device] VARCHAR(100) NOT NULL,
     [isActive] BIT NOT NULL CONSTRAINT [DeviceToken_isActive_df] DEFAULT 1,
@@ -89,7 +89,7 @@ CREATE TABLE [dbo].[DeviceToken] (
 -- CreateTable
 CREATE TABLE [dbo].[AuthSession] (
     [id] UNIQUEIDENTIFIER NOT NULL,
-    [userId] UNIQUEIDENTIFIER NOT NULL,
+    [userId] VARCHAR(128) NOT NULL,
     [token] VARCHAR(500) NOT NULL,
     [device] VARCHAR(100),
     [ipAddress] VARCHAR(50),
