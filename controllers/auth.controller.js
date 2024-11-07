@@ -2,21 +2,45 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const createAccount = async (req, res) => {
-  const { phoneNumber, userType, fullName } = req.body;
-  
-  // Validate required fields
-  if (!phoneNumber || !userType) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
+  const { userType } = req.body;
 
-  // Validate userType
-  const validUserTypes = ['customer', 'enabler', 'owner'];
-  if (!validUserTypes.includes(userType.toLowerCase())) {
-    return res.status(400).json({ error: 'Invalid user type' });
-  }
+  const id = req.user.uid;
+  const authProvider = req.user.firebase?.sign_in_provider;
+  const phoneNumber = req.user?.phone_number;
+  const email = req.user?.email || null;
+  const fullName = req.user?.name || req.body.fullName;
+  const profileImage = req.user.picture || null;
+
+
 
   try {
-    const id = req.user.uid;
+    if (!userType) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const validUserTypes = ['customer', 'enabler', 'owner'];
+    if (!validUserTypes.includes(userType.toLowerCase())) {
+      return res.status(400).json({ error: 'Invalid user type' });
+    }
+
+    const existingUserRole = await prisma.userRole.findFirst({
+      where: {
+        userId: id,
+        role: {
+          name: userType.toLowerCase()
+        }
+      }
+    });
+
+    if (existingUserRole) {
+      return res.status(400).json({
+        success: false,
+        message: `You are already registered as a ${userType}`
+      });
+    }
+
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 1);
 
     // Create or update user in a transaction
     const result = await prisma.$transaction(async (prisma) => {
@@ -25,12 +49,20 @@ export const createAccount = async (req, res) => {
         where: { id },
         create: {
           id,
+          fullName,
           phoneNumber,
-          isVerified: true
+          authProvider,
+          email,
+          profileImage 
+
         },
         update: {
+          fullName,
           phoneNumber,
-          isVerified: true
+          authProvider,
+          email,
+          profileImage
+
         }
       });
 
@@ -62,7 +94,6 @@ export const createAccount = async (req, res) => {
           await prisma.customer.create({
             data: {
               userId: user.id,
-              fullName
             }
           });
           break;
@@ -71,36 +102,42 @@ export const createAccount = async (req, res) => {
           await prisma.enabler.create({
             data: {
               userId: user.id,
-              fullName,
               experience: 'New'
             }
           });
           break;
 
         case 'owner':
-          const [firstName, ...lastNameParts] = fullName.split(' ');
           await prisma.owner.create({
             data: {
               userId: user.id,
-              firstName,
-              lastName: lastNameParts.join(' ') || firstName // Fallback if no last name
             }
           });
           break;
       }
+      await prisma.subscription.create({
+        data: {
+          userId: user.id,
+          plan: 'BASE',
+          status: 'ACTIVE',
+          startDate,
+          endDate,
+          allowedDevices: 1
+        }
+      })
 
       return user;
     });
 
     res.status(200).json({
-      message: 'User verified and created successfully',
+      message: 'User created successfully',
       user: result
     });
 
   } catch (error) {
-    console.error('Error in verifyOTP:', error);
+    console.error('Error while creating account', error);
     res.status(500).json({ error: 'Server error while creating user' });
-    
+
   }
 };
 
@@ -108,7 +145,7 @@ export const createAccount = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const userId = req.user.uid; // Assuming this comes from auth middleware
+    const userId = req.user.uid;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -136,7 +173,6 @@ export const getUser = async (req, res) => {
       id: user.id,
       phoneNumber: user.phoneNumber,
       email: user.email,
-      isVerified: user.isVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       roles: user.roles.map(ur => ur.role.name),
@@ -162,7 +198,6 @@ export const getUser = async (req, res) => {
       };
     }
 
-    // Remove unnecessary nested user references
     if (userResponse.profile) {
       delete userResponse.profile.userId;
       delete userResponse.profile.user;

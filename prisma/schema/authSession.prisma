@@ -1,0 +1,12 @@
+model AuthSession {
+  id        String   @id @default(uuid()) @db.UniqueIdentifier
+  userId    String   @db.VarChar(128) // Matching User UID type
+  token     String   @unique @db.VarChar(500)
+  device    String?  @db.VarChar(100)
+  ipAddress String?  @db.VarChar(50)
+  expiresAt DateTime @db.DateTime2
+  createdAt DateTime @default(now()) @db.DateTime2
+  updatedAt DateTime @updatedAt @db.DateTime2
+
+  user      User     @relation(fields: [userId], references: [id])
+}
