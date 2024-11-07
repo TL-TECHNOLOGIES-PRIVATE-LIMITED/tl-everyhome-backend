@@ -1,0 +1,13 @@
+model DeviceToken {
+  id        String   @id @default(uuid()) @db.UniqueIdentifier
+  userId    String   @db.VarChar(128)
+  token     String   @db.VarChar(500)
+  device    String   @db.VarChar(100)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.DateTime2
+  updatedAt DateTime @updatedAt @db.DateTime2
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, isActive], name: "UniqueActiveDevice")
+}

@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 router.post("/create-account",verifyFirebaseToken, createAccount);
-router.post("/getUser",verifyFirebaseToken, getUser);
+router.get("/getUser",verifyFirebaseToken, getUser);
 
 
 export default router;

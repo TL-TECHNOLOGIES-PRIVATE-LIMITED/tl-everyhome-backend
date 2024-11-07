@@ -1,0 +1,13 @@
+model Subscription {
+  id                String   @id @default(uuid()) @db.UniqueIdentifier
+  userId            String   @unique @db.VarChar(128)
+  plan              String   @db.VarChar(50)
+  status            String   @db.VarChar(20)
+  startDate         DateTime @db.DateTime2
+  endDate           DateTime @db.DateTime2
+  allowedDevices    Int      @default(1)
+  createdAt         DateTime @default(now()) @db.DateTime2
+  updatedAt         DateTime @updatedAt @db.DateTime2
+
+  user              User     @relation(fields: [userId], references: [id])
+}

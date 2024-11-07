@@ -1,0 +1,32 @@
+model Owner {
+  id            String   @id @default(uuid()) @db.UniqueIdentifier
+  userId        String   @unique @db.VarChar(128) // Matching User UID type
+  companyName   String?  @db.NVarChar(100)
+  businessType  String?  @db.VarChar(50)
+  taxId         String?  @db.VarChar(50)
+  createdAt     DateTime @default(now()) @db.DateTime2
+  updatedAt     DateTime @updatedAt @db.DateTime2
+
+  user          User     @relation(fields: [userId], references: [id])
+
+  ownerAddress  OwnerAddress[]
+}
+
+
+
+model OwnerAddress {
+  id            String   @id @default(uuid()) @db.UniqueIdentifier
+  ownerId       String   @db.UniqueIdentifier
+  addressType   String   @db.VarChar(20) @default("Home")
+  isDefault     Boolean  @default(false)
+  address       String   @db.NVarChar(200)
+  city          String   @db.NVarChar(50)
+  state         String   @db.NVarChar(50)
+  zipCode       String   @db.NVarChar(50)
+  latitude      Float    @db.Float
+  longitude     Float    @db.Float
+  createdAt     DateTime @default(now()) @db.DateTime2
+  updatedAt     DateTime @updatedAt @db.DateTime2
+
+  owner         Owner @relation(fields: [ownerId], references: [id])
+}
