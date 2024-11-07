@@ -6,6 +6,76 @@ const prisma = new PrismaClient();
 
 
 
+export const getProfile = async (req, res) => {
+    const userId = "Jq3jgY85GtXOSAGMjEXgMPjLHhx2"
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+          customer: true,
+          enabler: true,
+          owner: true,
+        },
+      });
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      // Determine the active role
+      const activeRole = user.roles.length > 0 ? user.roles[0].role : null;
+  
+      // Fetch the role-specific data
+      let roleData = null;
+      if (activeRole) {
+        if (activeRole.name === 'Customer') {
+          roleData = user.customer;
+        } else if (activeRole.name === 'Enabler') {
+          roleData = user.enabler;
+        } else if (activeRole.name === 'Owner') {
+          roleData = user.owner;
+        }
+      }
+  
+      // Construct the response
+      const response = {
+        id: user.id,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        authProvider: user.authProvider,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+        roles: user.roles.map((userRole) => ({
+          roleId: userRole.role.id,
+          name: userRole.role.name,
+        })),
+        activeRole: activeRole
+          ? {
+              roleId: activeRole.id,
+              name: activeRole.name,
+              ...roleData,
+            }
+          : null,
+      };
+  
+      return res.json(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while fetching the profile' });
+    }
+};
+
+
 export const addAddress = async (req, res) => {
     const { street, city, state, zip, latitude, longitude, addressType } = req.body;
     const userId = req.user.uid;
